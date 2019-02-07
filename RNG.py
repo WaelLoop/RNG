@@ -1,8 +1,16 @@
 import random
 import time
-
+from datetime import datetime
 
 def RNG(numOfPeople, numOfDays):
+
+    #list of names
+    listOfNames = []
+
+    for numbers in range(1,numOfPeople+1):
+        name = input("Input the names: ")
+        listOfNames.append(str(name))
+
     # empty list of RNG
     randomized = []
 
@@ -97,5 +105,30 @@ def revertChanges(dict, rank, who):
     dict.update({rank: lst})
 
 
+
+def createCSVWithNames(numPeople):
+    #creating the file
+    file = open("Rotation.csv",'w')
+    #first field is days
+    file.write("Date, ")
+    #next fields are the ranks
+    for i in range(1,numPeople+1):
+        if i == numPeople:
+            file.write(str(i))
+        else:
+            file.write(str(i) + ", ")
+    #print new line
+    file.write("\n")
+
+def fillUpNames(dict, namesList, numOfDays):
+    currDate = str(datetime.date(datetime.now()))
+
+
 if __name__ == '__main__':
-    print(RNG(3,6))
+    #print(RNG(3,6))
+    #createCSVWithNames(3)
+
+    x = str(datetime.date(datetime.now()))
+    print(x)
+    sl = x[:-1]
+    print(sl)
