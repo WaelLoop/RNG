@@ -1,6 +1,6 @@
 import random
 import time
-from datetime import datetime
+from datetime import datetime,timedelta
 
 def RNG(numOfPeople, numOfDays):
 
@@ -66,8 +66,10 @@ def RNG(numOfPeople, numOfDays):
         # increment the day
         iteration += 1
 
-    #return the order
-    return history
+    #write to csv
+    createCSVWithNames(numOfPeople)
+    fillUpNames(history,listOfNames,numOfDays)
+
 
 def isValid(dict, numOfPeople, numOfDays):
     number = numOfDays / numOfPeople
@@ -120,15 +122,39 @@ def createCSVWithNames(numPeople):
     #print new line
     file.write("\n")
 
-def fillUpNames(dict, namesList, numOfDays):
-    currDate = str(datetime.date(datetime.now()))
+def fillUpNames(listOfDict, namesList, numOfDays):
+    #get the current date of this program execution
+    currDate = datetime.date(datetime.now())
+    #our counter
+    day = 1
+    #reopen the file that we want to append to
+    file = open("Rotation.csv",'a')
+    #length of the list of names
+    lenOfList = len(namesList)
+
+    while (day <= numOfDays):
+        #write down the current date
+        file.write(str(currDate) + ", ")
+        #our counter
+        counter = 1
+        index = listOfDict[day - 1]
+        for i in index.keys():
+            #get the index of the name
+            value = index[i]
+            #get the name from the list
+            name = namesList[value - 1]
+            #if we are at the end, dont add ,
+            if counter == lenOfList:
+                file.write(name + "\n")
+            else:
+                file.write(name + ", ")
+            #increment counter
+            counter += 1
+
+        #updating the date
+        currDate += timedelta(days=1)
+        day += 1
 
 
 if __name__ == '__main__':
-    #print(RNG(3,6))
-    #createCSVWithNames(3)
-
-    x = str(datetime.date(datetime.now()))
-    print(x)
-    sl = x[:-1]
-    print(sl)
+    RNG(5,5)
