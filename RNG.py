@@ -157,4 +157,6 @@ def fillUpNames(listOfDict, namesList, numOfDays):
 
 
 if __name__ == '__main__':
-    RNG(5,5)
+    people = input("Enter the number of people: ")
+    days = input("Enter the number of days: ")
+    RNG(people,days)
