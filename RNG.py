@@ -1,28 +1,18 @@
 import random
-import time
-from datetime import datetime,timedelta
+from datetime import datetime, timedelta
+import tkinter as tk
 
-def RNG(numOfPeople, numOfDays):
-
-    #list of names
-    listOfNames = []
-
-    for numbers in range(1,numOfPeople+1):
-        name = input("Input the names: ")
-        listOfNames.append(str(name))
-
+def RNG(numOfPeople, numOfDays, listOfNames):
+    numOfPeople = int(numOfPeople)
+    numOfDays = int(numOfDays)
     # empty list of RNG
     randomized = []
-
-    # our cumalitve number of times someone was assigned
+    # our cumalitive number of times someone was assigned
     totalOrder = {}
-
     # history of random assignments
     history = []
-
     # our iterator variable
     iteration = 1
-
     # filling up the list with the given argument
     for i in range(1, numOfPeople + 1):
         totalList = []
@@ -30,28 +20,20 @@ def RNG(numOfPeople, numOfDays):
         for j in range(1, numOfPeople + 1):
             totalList.append({j: 0})
         totalOrder.update({i: totalList})
-
-
     # looping through the number of days given
     while (iteration <= numOfDays):
-
         while (True):
-
             # reset the order every time we have to randomized
             order = {}
-
             # shuffling the list
             random.shuffle(randomized)
-
             for (i, j) in zip(range(1, numOfPeople + 1), randomized):
                 order.update({i: j})
-
             # increment each order in the totalOrder
             for ord in order.keys():
                 rank = ord
                 whoWasIt = order[ord]
                 updateFinal(totalOrder, rank, whoWasIt)
-
             if (isValid(totalOrder,numOfPeople,numOfDays) == True):
                 # apppend the random assingment to the history of assignments
                 history.append(order)
@@ -62,10 +44,8 @@ def RNG(numOfPeople, numOfDays):
                     rank = ord
                     whoWasIt = order[ord]
                     revertChanges(totalOrder,rank,whoWasIt)
-
         # increment the day
         iteration += 1
-
     #write to csv
     createCSVWithNames(numOfPeople)
     fillUpNames(history,listOfNames,numOfDays)
@@ -105,7 +85,6 @@ def revertChanges(dict, rank, who):
             if j == who:
                 i[j] -= 1
     dict.update({rank: lst})
-
 
 
 def createCSVWithNames(numPeople):
@@ -156,7 +135,85 @@ def fillUpNames(listOfDict, namesList, numOfDays):
         day += 1
 
 
+# Method the designs the GUI for this program
+def CreateGUIFillNames(numOfPeople, numOfDays):
+    # list of names
+    listOfNames = []
+    listOfEntries = []
+
+    numOfPeople = int(numOfPeople)
+    numOfDays = int(numOfDays)
+
+    # Function that calls the RNG
+    def CallRNG():
+        for i in range(0, numOfPeople):
+            #fetch an entry
+            entry = listOfEntries[i]
+            #retrieve the name
+            listOfNames.append(entry.get())
+        # Generate the list
+        RNG(numOfPeople, numOfDays, listOfNames)
+        # once done, notify the user
+        masterFillNames.destroy()
+        CreateGUISuccess()
+
+
+    # function that goes back to the previous GUI
+    def GoBack():
+        masterFillNames.destroy()
+        CreateGUIPrompt()
+
+    # Window
+    masterFillNames = tk.Tk()
+    tk.Label(masterFillNames, text="Input the names").grid(row=0, column=0)
+
+    for i in range(1, numOfPeople + 1):
+        entry = tk.Entry(masterFillNames)
+        entry.grid(row=i, column=0)
+        listOfEntries.append(entry)
+
+    tk.Button(masterFillNames, text='Create', command=CallRNG).grid(row=numOfPeople+2, column=0, sticky=tk.W)
+    tk.Button(masterFillNames, text='Back', command=GoBack).grid(row=numOfPeople+2, column=1, sticky=tk.W)
+
+    tk.mainloop()
+
+
+
+
+# GUI function that prompts the user to enter the number of people and the number of days
+# source: https://www.python-course.eu/tkinter_entry_widgets.php
+def CreateGUIPrompt():
+
+    def CallGUIFillNames():
+        if e1.get().isdigit() and e2.get().isdigit():
+            numOfPeople = e1.get()
+            numOfDays = e2.get()
+            masterPrompt.destroy()
+            CreateGUIFillNames(numOfPeople, numOfDays)
+        else:
+            print("ERROR! ONE OF THE FIELDS IS EMPTY OR YOU DIDNT PASS A DIGIT")
+
+    masterPrompt = tk.Tk()
+    tk.Label(masterPrompt,
+             text="Enter the number of people:").grid(row=0)
+    tk.Label(masterPrompt,
+             text="Enter the number of Days:").grid(row=1)
+
+    e1 = tk.Entry(masterPrompt)
+    e2 = tk.Entry(masterPrompt)
+
+    e1.grid(row=0, column=1)
+    e2.grid(row=1, column=1)
+
+    tk.Button(masterPrompt, text='Create', command=CallGUIFillNames).grid(row=3, column=0, sticky=tk.W, pady=4)
+    tk.mainloop()
+
+# GUI that notifies the user
+def CreateGUISuccess():
+    masterSuccess = tk.Tk()
+    tk.Label(masterSuccess, text="The sheet has been generated!").grid(row=0)
+    tk.Button(masterSuccess, text="Quit", command=masterSuccess.destroy).grid(row=1)
+    tk.mainloop()
+
 if __name__ == '__main__':
-    people = input("Enter the number of people: ")
-    days = input("Enter the number of days: ")
-    RNG(people,days)
+    CreateGUIPrompt()
